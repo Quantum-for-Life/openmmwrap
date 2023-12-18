@@ -6,7 +6,7 @@
 
 # Options used for the minimization (passed to the 
 # 'openmm.app.simulation.Simulation.minimizeEnergy'
-# method
+# method)
 minimization:
 
   # The tolerance - stop when the change in energy is smaller than

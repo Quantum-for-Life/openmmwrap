@@ -61,7 +61,7 @@ barostat:
 
     # The frequency at which Monte Carlo pressure changes should
     # be attempted (in time steps)
-    monte_carlo_frequency: 25
+    monte_carlo_frequency: !!null
 
     # The force group this Force belongs to (supported values are
     # integers between 0 and 31, or None)

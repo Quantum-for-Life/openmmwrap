@@ -35,11 +35,11 @@ integrator:
     #----------------------- Optional settings -----------------------#
 
     # The size of each time step (in picoseconds)
-    step_size: 0.001
+    step_size: !!null
 
     # The maximum step size the integrator will ever use (in
     # picoseconds)
-    maximum_step_size: 0.002
+    maximum_step_size: !!null
 
     # The distance tolerance within which constraints are
     # maintained, as a fraction of the constrained distance

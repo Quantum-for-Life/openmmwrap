@@ -130,7 +130,8 @@ def _load_config_minimization(config):
 
         # Set it with the appropriate units
         config_updated["tolerance"] = \
-            config["tolerance"] * (unit.kilojoule / unit.mole)
+            config["tolerance"] * \
+                (unit.kilojoule / (unit.nanometer * unit.mole))
 
     # Return the updated configuration
     return config_updated

@@ -58,12 +58,12 @@ system:
   nonbondedMethod: PME
 
   # Which cut-off to use for non-bonded interactions (nm)
-  nonbondedCutoff: 0.9
+  nonbondedCutoff: 1.1
 
   # The bonds and angles that should be implemented as
   # constraints
   constraints: HBonds
 
   # Whether to keep the water molecules rigid - set it
-  # to 'True' ot the water model is 'tip3p'
+  # to 'True' since the water model is 'tip3p'
   rigidWater: True

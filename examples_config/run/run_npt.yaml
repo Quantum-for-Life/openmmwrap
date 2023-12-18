@@ -30,6 +30,30 @@ integrator:
     step_size: 0.001
 
 
+#----------------------------- Barostat ------------------------------#
+
+
+# The configuration for the barostat
+barostat:
+
+  # The name of the barostat
+  name: MonteCarloBarostat
+
+  # Where the barostat comes from. In this case,
+  # it is a barostat from 'openmm'
+  is_from: openmm
+
+  # The options to use to set the barostat
+  options:
+
+    # The pressure acting on the system (in bar)
+    pressure: 1
+
+    # The temperature at which the system is being maintained
+    # (in Kelvin)
+    temperature: 298
+
+
 #-------------------------------- Run --------------------------------#
 
 
