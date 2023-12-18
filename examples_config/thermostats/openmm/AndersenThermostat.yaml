@@ -1,0 +1,60 @@
+# Example of configuration for OpenMM's 'AndersenThermostat'.
+
+# You may copy this configuration into the configuration
+# files used with the 'openmm-run' executable and modify it
+# as you see fit.
+
+# The options listed in the 'options' sections are the
+# same ones that can be passed to the 'openmmwrap.mdutil.
+# thermostats.get_thermostat' function to set the thermostat
+# via openmmwrap's API.
+
+# You can find the documentation for the thermostat here:
+# http://docs.openmm.org/latest/api-python/generated/
+# openmm.openmm.AndersenThermostat.html
+
+# The configuration for the thermostat
+thermostat:
+
+  # The name of the thermostat
+  name: AndersenThermostat
+
+  # Where the thermostat comes from. In this case,
+  # it is a thermostat from 'openmm'
+  is_from: openmm
+
+  # The options that can be used to set up
+  # the thermostat
+  options:
+
+    #----------------------- Required settings -----------------------#
+
+    # The temperature of the heat bath (in Kelvin)
+    temperature: 298
+
+    # The collision frequency (in inverse picoseconds)
+    collision_frequency: 100
+
+    #----------------------- Optional settings -----------------------#
+
+    # The force group this Force belongs to (supported values are
+    # integers between 0 and 31, or None)
+    force_group: !!null
+
+    # The seed to be used for random numbers generation.
+    # The precise meaning of this parameter is undefined,
+    # and is left up to each platform to interpret in an
+    # appropriate way. It is guaranteed that if two simulations
+    # are run with different random number seeds, the sequence
+    # of random forces will be different. On the other hand,
+    # no guarantees are made about the behavior of simulations
+    # that use the same seed. In particular, platforms are
+    # permitted to use non-deterministic algorithms, which
+    # produce different results on successive runs, even
+    # if those runs were initialized identically. If the seed
+    # is set to 0 (which is the default value assigned), a
+    # unique seed is chosen when a 'Context' is created from
+    # this 'Force'. This is done to ensure that each 'Context'
+    # receives unique random seeds without you needing to
+    # set them explicitly (from OpenMM's documentation)
+    random_number_seed: !!null

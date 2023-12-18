@@ -1,0 +1,136 @@
+# Configuration file to perform an equilibration in the NVT
+# ensemble using the the 'openmmwrap-run' executable
+
+
+#--------------------- Integrator and thermostat ---------------------#
+
+
+# Options for the integrator
+integrator:
+
+  # The name of the integrator
+  name: LangevinIntegrator
+
+  # Where the integrator comes from. In this case,
+  # it is an integrator from 'openmm'
+  is_from: openmm
+
+  # Options to use to set the integrator
+  options:
+
+    # The target temperature for the system (K)
+    temperature: 298
+
+    # The frequency of the interaction of the system with the
+    # heat bath (ps^-1)
+    friction_coeff: 50
+
+    # The step size with which to integrate the system (ps)
+    step_size: 0.001
+
+
+#-------------------------------- Run --------------------------------#
+
+
+# Options to run
+run:
+
+  # The number of steps to be run
+  n_steps: 1000000
+
+
+#---------------------------- Restraints -----------------------------#
+
+
+# Options for restraints applied to the system
+restraints:
+
+  # Periodic distance restraint to restraint atoms' positions close
+  # to the starting positions - the name of the restraint is
+  # arbitrary but should be unique, what counts is the
+  # 'restraint_type' and the 'restraint_options'
+  periodic_distance_all_atoms:
+
+    # Type of restraint
+    restraint_type: periodic_distance
+
+    # Options to set the restraint
+    restraint_options:
+
+      # 'k' constant (kjoule / mol / (nm^2))
+      k: 1000
+
+
+#------------------------- Trajectory output -------------------------#
+
+
+# Options regarding how often frames are written to the XTC
+# trajectory file, etc. (passed to the
+# 'mdtraj.reporters.xtcreporter.XTCReporter' constructor)
+trajectory:
+
+  # The interval (in time steps) at which to write data
+  reportInterval: 100
+
+  # A list of 0-based indexes of the atoms that should be
+  # included in the trajectory. If !!null, all atoms will
+  # be included
+  atomSubset: !!null
+
+  # Whether to append to an existing file
+  append: False
+
+
+#------------------------- State data output -------------------------#
+
+
+# Options regarding the data included in the state data file,
+# how often data are written to the file, etc. (passed to the
+# 'openmm.app.statedatareporter.StateDataReporter'
+# constructor)
+state_data:
+
+  # The interval (in time steps) at which to write data
+  reportInterval: 10000
+
+  # Whether to write the current step index
+  step: True
+
+  # Whether to write the current time
+  time: True
+
+  # Whether to write the potential energy
+  potentialEnergy: True
+
+  # Whether to write the kinetic energy
+  kineticEnergy: True
+
+  # Whether to write the total energy
+  totalEnergy: True
+
+  # Whether to write the instantaneous temperature
+  temperature: False
+
+  # Whether to write the periodic box volume
+  volume: False
+
+  # Whether to write the system's density
+  density: False
+
+  # Whether to append to an existing file
+  append: False
+
+  # You can check out all the supported options here:
+  # http://docs.openmm.org/latest/api-python/generated/
+  # openmm.app.statedatareporter.StateDataReporter.html
+
+
+#---------------------------- Checkpoint -----------------------------#
+
+
+# Options to write checkpoint files
+checkpoint:
+
+  # The interval (in time steps) at which to write data
+  reportInterval: 10000
+

@@ -1,0 +1,128 @@
+# Example of configuration for OpenMM's 'NoseHooverIntegrator'.
+
+# You may copy this configuration into the configuration
+# files used with the 'openmm-run' executable and modify it
+# as you see fit.
+
+# The options listed in the 'options' sections are the
+# same ones that can be passed to the 'openmmwrap.mdutil.
+# integrators.get_integrator' function to set the integrator
+# via openmmwrap's API.
+
+# You can find the documentation for the integrator here:
+# http://docs.openmm.org/latest/api-python/generated/
+# openmm.openmm.NoseHooverIntegrator.html
+
+# The configuration for the integrator
+integrator:
+
+  # The name of the integrator
+  name: NoseHooverIntegrator
+
+  # Where the integrator comes from. In this case,
+  # it is an integrator from 'openmm'
+  is_from: openmm
+
+  # The options that can be used to set up 
+  # the integrator
+  options:
+
+    #----------------------- Required settings -----------------------#
+
+    # The size of each time step (in picoseconds)
+    step_size: 0.001
+
+    #----------------------- Optional settings -----------------------#
+
+    # The thermostat(s) regulating the system's temperature.
+
+    # To define one thermostat for the entire system, add only
+    # thermostat named 'full_system'.
+
+    # You can define multiple thermostats for different portions
+    # of the system. The thermostats can have arbitrary names.
+
+    # The thermostats for these portions of the system should define,
+    # in addition to the same required settings of a full-system
+    # thermostat:
+    # - A 'thermostated_particles' option, defining the integer IDs
+    #   of the particles to be thermostated.
+    # - Optionally, a 'thermostated_pairs' option, defining a list
+    #   of pairs of connected atoms (identified by their integer IDs)
+    #   whose absolute center of mass motion and motion relative to
+    #   one another will be independently thermostated.
+    thermostats:
+
+      # The thermostat for the entire system
+      full_system:
+
+        #--------------- Required thermostat settings ----------------#
+
+        # The target temperature (in Kelvin)
+        temperature: 298
+
+        # The frequency of the interaction with the heat bath
+        # (in inverse picoseconds)
+        collision_frequency: 100
+
+        #--------------- Optional thermostat settings ----------------#
+
+        # The number of beads in the Nose-Hoover chain
+        chain_length: 3
+
+        # The number of steps in the multiple time step chain
+        # propagation algorithm
+        num_mts: 3
+
+        # The number of terms in the Yoshida-Suzuki multi-time
+        # step decomposition used in the chain propagation
+        # algorithm (must be 1, 3, 5, or 7)
+        num_yoshida_suzuki: 7
+
+      # A thermostat for a portion of the system
+      # sub_system:
+
+        #--------------- Required thermostat settings ----------------#
+        
+        # A list defining the integer IDs of the particles to be
+        # thermostated
+        # thermostated_particles: [0,1,2,3]
+
+        # A list defining the pairs of connected atoms (identified
+        # by their integer IDs) whose absolute center of mass motion
+        # and motion relative to one another will be independently
+        # thermostated
+        # thermostated_pairs: [[0,1], [2,3]]
+
+        # The target temperature (in Kelvin)
+        # temperature: 298
+
+        # The frequency of the interaction with the heat bath
+        # (in inverse picoseconds)
+        # collision_frequency: 100
+
+        # The target temperature for each pair's relative motion
+        # (in Kelvin) - it must be passed if either 
+        # 'thermostated_particles' or 'thermostated_pairs' are
+        # passed
+        # relative_temperature: 298 
+
+        # The frequency of the interaction with the heat bath for the
+        # pairs' center of mass motion (in inverse picoseconds) - it
+        # must be passed if either 'thermostated_particles' or
+        # 'thermostated_pairs' are passed
+        # relative_collision_frequency: 100
+
+        #--------------- Optional thermostat settings ----------------#
+
+        # The number of beads in the Nose-Hoover chain
+        # chain_length: 3
+
+        # The number of steps in the multiple time step chain
+        # propagation algorithm
+        # num_mts: 3
+
+        # The number of terms in the Yoshida-Suzuki multi-time
+        # step decomposition used in the chain propagation
+        # algorithm (must be 1, 3, 5, or 7)
+        # num_yoshida_suzuki: 7

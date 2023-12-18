@@ -1,0 +1,69 @@
+# Configuration file for the 'openmm-create-system' executable
+
+
+#---------------------------- Force field ----------------------------#
+
+
+# Force field's options
+force_field:
+
+  # Fixed force fields
+  fixed: ["amber99sbildn.xml", "tip3p.xml"]
+
+  # Force field to be used to parametrize unknown molecules
+  param: gaff-2.11
+
+
+#----------------------------- Solvation -----------------------------#
+
+
+# Solvation options (passed to the
+# 'simtk.openmm.app.modeller.Modeller.addSolvent' method)
+solvation:
+
+  # Water model to be used
+  model: tip3p
+
+  # Shape of the solvation box to be used
+  boxShape: dodecahedron
+
+  # Padding to be used when building the box
+  # (nm)
+  padding: 1.2
+
+  # Whether to neutralize the total charge
+  # of the system
+  neutralize: True
+
+  # The total concentration of ions to add (apart
+  # from those added to neutralize the system, if
+  # neutralization was enabled) (mol/L)
+  ionicStrength: 0.15
+
+  # Which positive ion to use
+  positiveIon: Na+
+
+  # Which negative ion to use
+  negativeIon: Cl-
+
+
+#-------------------------- System creation --------------------------#
+
+
+# Options used for the creation of the system (passed to the
+# 'simtk.openmm.app.modeller.forcefield.ForceField' method)
+system:
+
+  # Which method to use for non-bonded interactions
+  nonbondedMethod: PME
+
+  # Which cut-off to use for non-bonded interactions (nm)
+  nonbondedCutoff: 0.9
+
+  # The bonds and angles that should be implemented as
+  # constraints
+  constraints: HBonds
+
+  # Whether to keep the water molecules rigid - set it
+  # to 'True' ot the water model is 'tip3p'
+  rigidWater: True

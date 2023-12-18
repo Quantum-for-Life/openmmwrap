@@ -1,0 +1,86 @@
+# Example of configuration for OpenMM's 'MonteCarloMembraneBarostat'.
+
+# You may copy this configuration into the configuration
+# files used with the 'openmm-run' executable and modify it
+# as you see fit.
+
+# The options listed in the 'options' sections are the
+# same ones that can be passed to the 'openmmwrap.mdutil.
+# barostats.get_barostat' function to set the barostat
+# via openmmwrap's API.
+
+# You can find the documentation for the barostat here:
+# http://docs.openmm.org/latest/api-python/generated/
+# openmm.openmm.MonteCarloMembraneBarostat.html
+
+# The configuration for the barostat
+barostat:
+
+  # The name of the barostat
+  name: MonteCarloMembraneBarostat
+
+  # Where the barostat comes from. In this case,
+  # it is a barostat from 'openmm'
+  is_from: openmm
+
+  # The options that can be used to set up
+  # the barostat
+  options:
+
+    #----------------------- Required settings -----------------------#
+
+    # The pressure acting on the system (in bar)
+    pressure: 1
+
+    # The surface tension acting on the system (in bar * nanometer)
+    surface_tension: 1
+
+    # The temperature at which the system is being maintained
+    # (in Kelvin)
+    temperature: 298
+
+    # The mode specifying the behavior of the X and Y dimensions.
+    # Supported values are:
+    # - XYAnisotropic: the X and Y dimensions are allowed to vary
+    #   independently of each other.
+    # - XYIsotropic: the X and Y dimensions are always scaled by the
+    #   same amount, so the ratio of their lengths remains constant.
+    xy_mode: XYAnisotropic
+
+    # The mode specifying the behavior of the Z dimension.
+    # Supported values are:
+    # - ZFixed: the Z dimension is held fixed and does not change.
+    # - ZFree: the Z dimension is allowed to vary freely, independent
+    #   of the other two dimensions.
+    # - ConstantVolume: the Z dimension is always scaled in inverse
+    #   proportion to the other two dimensions so the box volume
+    #   remains fixed.
+    xy_mode: ZFree
+
+    #----------------------- Optional settings -----------------------#
+
+    # The frequency at which Monte Carlo pressure changes should
+    # be attempted (in time steps)
+    monte_carlo_frequency: 25
+
+    # The force group this Force belongs to (supported values are
+    # integers between 0 and 31, or None)
+    force_group: !!null
+
+    # The seed to be used for random numbers generation.
+    # The precise meaning of this parameter is undefined,
+    # and is left up to each platform to interpret in an
+    # appropriate way. It is guaranteed that if two simulations
+    # are run with different random number seeds, the sequence
+    # of random forces will be different. On the other hand,
+    # no guarantees are made about the behavior of simulations
+    # that use the same seed. In particular, platforms are
+    # permitted to use non-deterministic algorithms, which
+    # produce different results on successive runs, even
+    # if those runs were initialized identically. If the seed
+    # is set to 0 (which is the default value assigned), a
+    # unique seed is chosen when a 'Context' is created from
+    # this 'Force'. This is done to ensure that each 'Context'
+    # receives unique random seeds without you needing to
+    # set them explicitly (from OpenMM's documentation)
+    random_number_seed: !!null

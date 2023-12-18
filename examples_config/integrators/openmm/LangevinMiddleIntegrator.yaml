@@ -1,0 +1,74 @@
+# Example of configuration for OpenMM's 'LangevinMiddleIntegrator'.
+
+# You may copy this configuration into the configuration
+# files used with the 'openmm-run' executable and modify it
+# as you see fit.
+
+# The options listed in the 'options' sections are the
+# same ones that can be passed to the 'openmmwrap.mdutil.
+# integrators.get_integrator' function to set the integrator
+# via openmmwrap's API.
+
+# You can find the documentation for the integrator here:
+# http://docs.openmm.org/latest/api-python/generated/
+# openmm.openmm.LangevinMiddleIntegrator.html
+
+# The configuration for the integrator
+integrator:
+
+  # The name of the integrator
+  name: LangevinMiddleIntegrator
+
+  # Where the integrator comes from. In this case,
+  # it is an integrator from 'openmm'
+  is_from: openmm
+
+  # The options that can be used to set up 
+  # the integrator
+  options:
+
+    #----------------------- Required settings -----------------------#
+
+    # The temperature of the heat bath (in Kelvin)
+    temperature: 298
+
+    # The friction coefficient, which determines how strongly
+    # the system is coupled to the heat bath (in inverse 
+    # picoseconds)
+    friction_coeff: 100
+
+    # The size of each time step (in picoseconds)
+    step_size: 0.001
+
+    #----------------------- Optional settings -----------------------#
+    
+    # The distance tolerance within which constraints are
+    # maintained, as a fraction of the constrained distance
+    constraint_tolerance: !!null
+
+    # Which force groups to use for integration. By default,
+    # all force groups are included. The groups are defined as
+    # a set of indices for which force groups to include when
+    # integrating the equations of motion. Alternatively, the
+    # groups can be passed as a single unsigned integer
+    # interpreted as a bitmask, in which case group 'i' will
+    # be included if (groups & (1<<i)) != 0
+    integration_force_groups: !!null
+
+    # The seed to be used for random numbers generation.
+    # The precise meaning of this parameter is undefined,
+    # and is left up to each platform to interpret in an
+    # appropriate way. It is guaranteed that if two simulations
+    # are run with different random number seeds, the sequence
+    # of random forces will be different. On the other hand,
+    # no guarantees are made about the behavior of simulations
+    # that use the same seed. In particular, platforms are
+    # permitted to use non-deterministic algorithms, which
+    # produce different results on successive runs, even
+    # if those runs were initialized identically. If the seed
+    # is set to 0 (which is the default value assigned), a
+    # unique seed is chosen when a 'Context' is created from
+    # this 'Force'. This is done to ensure that each 'Context'
+    # receives unique random seeds without you needing to
+    # set them explicitly (from OpenMM's documentation)
+    random_number_seed: !!null

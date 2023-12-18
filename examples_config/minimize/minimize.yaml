@@ -1,0 +1,17 @@
+# Configuration file for the 'openmmwrap-minimize' executable
+
+
+#--------------------------- Minimization ----------------------------#
+
+
+# Options used for the minimization (passed to the 
+# 'openmm.app.simulation.Simulation.minimizeEnergy'
+# method
+minimization:
+
+  # The tolerance - stop when the change in energy is smaller than
+  # this value (kJ/mol)
+  tolerance: 10
+
+  # The maximum number of iterations to be performed
+  maxIterations: 10000

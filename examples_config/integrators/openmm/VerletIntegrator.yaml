@@ -1,0 +1,48 @@
+# Example of configuration for OpenMM's 'VerletIntegrator'.
+
+# You may copy this configuration into the configuration
+# files used with the 'openmm-run' executable and modify it
+# as you see fit.
+
+# The options listed in the 'options' sections are the
+# same ones that can be passed to the 'openmmwrap.mdutil.
+# integrators.get_integrator' function to set the integrator
+# via openmmwrap's API.
+
+# You can find the documentation for the integrator here:
+# http://docs.openmm.org/latest/api-python/generated/
+# openmm.openmm.VerletIntegrator.html
+
+# The configuration for the integrator
+integrator:
+
+  # The name of the integrator
+  name: VerletIntegrator
+
+  # Where the integrator comes from. In this case,
+  # it is an integrator from 'openmm'
+  is_from: openmm
+
+  # The options that can be used to set up
+  # the integrator
+  options:
+
+    #----------------------- Required settings -----------------------#
+
+    # The size of each time step (in picoseconds)
+    step_size: 0.001
+
+    #----------------------- Optional settings -----------------------#
+
+    # The distance tolerance within which constraints are
+    # maintained, as a fraction of the constrained distance
+    constraint_tolerance: !!null
+    
+    # Which force groups to use for integration. By default,
+    # all force groups are included. The groups are defined as
+    # a set of indices for which force groups to include when
+    # integrating the equations of motion. Alternatively, the
+    # groups can be passed as a single unsigned integer
+    # interpreted as a bitmask, in which case group 'i' will
+    # be included if (groups & (1<<i)) != 0
+    integration_force_groups: !!null
