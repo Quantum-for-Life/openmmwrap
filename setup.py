@@ -49,7 +49,8 @@ entry_points = \
          f"{name}.execs.{name}_minimize:main",
          f"{name}-run = " \
          f"{name}.execs.{name}_run:main",
-        ],
+         f"{name}-convert = " \
+         f"{name}.execs.{name}_convert:main"]
     }
 
 # Run the setup
