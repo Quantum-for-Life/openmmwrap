@@ -3,7 +3,7 @@
 
 #    _util.py
 #
-#    Private utilities.
+#    Private utilities to run simulations.
 #
 #    Copyright (C) 2023 Valentina Sora 
 #                       <sora.valentina1@gmail.com>
@@ -32,11 +32,45 @@ def get_option(options,
                required = False,
                default = None,
                units = None):
+    """Get an option from a dictionary of options used
+    to configure a specific object.
+
+    Parameters
+    ----------
+    options : ``dict``
+        The dictionary of options.
+
+    option_name : ``str``
+        The name of the option of interest.
+
+    obj_name : ``str``
+        The name of the object to be configured (for logging
+        purposes).
+
+    accepted_types : ``tuple``
+        The accepted data types for the option's value.
+
+    required : ``bool``, ``False``
+        Whether the option is required.
+
+    default : any data type, optional
+        The default value for the option, in case it
+        is not defined.
+
+    units : ``openmm.openmm.Unit``, optional
+        The units to be used for the option's value,
+        if any.
+
+    Returns
+    -------
+    value : any data type
+        The option's value.
+    """
 
     # Get the option's value
     option_value = options.get(option_name)
 
-    # If no option was passed
+    # If no value was passed for the option
     if option_value is None:
 
         # If there is a default value
@@ -66,7 +100,7 @@ def get_option(options,
     # If the option's value is not of an accepted type
     if not isinstance(option_value, accepted_types):
 
-        # Get a string represented the accepted types
+        # Get a string representing the accepted types
         accepted_types_str = \
             ", ".join([f"'{t.__name__}'" for t in accepted_types])
 
@@ -74,7 +108,7 @@ def get_option(options,
         errstr = \
             f"'{option_name}' cannot be of type " \
             f"'{type(option_value)}'. Supported types are: " \
-            f"{accepted_types}."
+            f"{accepted_types_str}."
         raise TypeError(errstr)
 
     # If specific units were passed

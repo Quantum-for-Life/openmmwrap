@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 # -*- Mode: python; tab-width: 4; indent-tabs-mode:nil; coding:utf-8 -*-
 
-#    openmmwrap_conv.py
+#    openmmwrap_find_frame.py
 #
-#    Convert between trajectory formats.
+#    Find a frame in a simulation using a state data file.
 #
 #    Copyright (C) 2023 Valentina Sora 
 #                       <sora.valentina1@gmail.com>
@@ -17,7 +17,8 @@ import logging as log
 import os
 import sys
 # openmmwrap
-from openmmwrap.md import conversion
+import openmmwrap.io as io
+from openmmwrap.md import frameselection
 
 
 def main():
@@ -27,28 +28,43 @@ def main():
 
 
     # Create the argument parser
-    prog = "openmmwrap-conv"
+    prog = "openmmwrap-find-frame"
     description = \
-        "Convert between trajectory formats."
+        "Find a frame in a simulation using a state data file."
     parser = argparse.ArgumentParser(prog = prog,
                                      description = description)
 
-    ip_help = \
-        "The PDB file containing the atomic coordinates of the " \
-        "input system."
-    parser.add_argument("-ip", "--input-structure",
+    isd_help = \
+        "The CSV file containing the state data of the " \
+        "simulation."
+    parser.add_argument("-isd", "--input-state-data",
                         required = True,
-                        help = ip_help)
+                        help = isd_help)
 
-    it_help = "The input trajectory."
-    parser.add_argument("-it", "--input-trajectory",
-                        required = True,
-                        help = it_help)
+    of_default = "frame.csv"
+    of_help = \
+        "The name of the CSV file where to write the details " \
+        "of the frame of interest. The file wil be " \
+        "written in the working directory. The default " \
+        f"file name is '{of_default}'."
+    parser.add_argument("-of", "--output-frame",
+                        default = of_default,
+                        help = of_help)
 
-    ot_help = "The output trajectory."
-    parser.add_argument("-ot", "--output-trajectory",
+    m_choices = \
+        ["closest_to_mean_temperature",
+         "closest_to_mean_temperature_second_half",
+         "closest_to_mean_density",
+         "closest_to_mean_density_second_half",
+         "closest_to_mean_volume",
+         "closest_to_mean_volume_second_half"]
+    m_choices_str = ", ".join([f"'{c}'" for c in m_choices])
+    m_help = \
+        "The method to use to select the frame. Supported " \
+        f"methods are: {m_choices_str}."
+    parser.add_argument("-m", "--method",
                         required = True,
-                        help = ot_help)
+                        help = m_help)
 
     d_help = \
         "The working directory. The default is the current " \
@@ -83,75 +99,26 @@ def main():
                         action = "store_true",
                         help = vv_help)
 
-    start_help = \
-        "The starting point (in frame number) of the " \
-        "output trajectory. By default, the output " \
-        "trajectory will start at the same frame as " \
-        "the input trajectory."
-    parser.add_argument("--start",
-                        help = start_help)
+    sep_default = ","
+    sep_help = \
+        "The column separator in the input state data " \
+        f"file. By default, '{sep_default}' is used."
+    parser.add_argument("--sep",
+                        default = sep_default,
+                        help = sep_help)
 
-    end_help = \
-        "The ending point (in frame number) of the " \
-        "output trajectory. By default, the output " \
-        "trajectory will end at the same frame as " \
-        "the input trajectory."
-    parser.add_argument("--end",
-                        help = end_help)
-
-    stride_help = \
-        "The stride (in number of frames). By default, " \
-        "no frames will be skipped when writing the " \
-        "output trajectory."
-    parser.add_argument("--stride",
-                        help = stride_help)
-
-    frames = \
-        "A list of specific frames to be included in the " \
-        "output trajectory, or a method to select specifc " \
-        "If 'selection_frames' is provided, " \
-        "'begin', 'end', and 'stride' are ignored, if " \
-        "provided."
-    parser.add_argument("--frames",
-                        help = frames)
-
-    selection_help = \
-        "The selection string (in MDAnalysis format) " \
-        "defining which atoms will be included in the " \
-        "output trajectory."
-    parser.add_argument("--selection",
-                        help = selection_help)
-
-    center_help = \
-        "Whether to center the 'center_selection' " \
-        "atoms in the box."
-    parser.add_argument("--center",
-                        action = "store_true")
-
-    center_selection_help = \
-        "The selection string (in MDAnalysis format) " \
-        "defining which atoms will be centered in the " \
-        "box."
-    parser.add_argument("--center-selection",
-                        help = center_selection_help)
 
     # Parse the arguments
     args = parser.parse_args()
-    input_structure = args.input_structure
-    input_trajectory = args.input_trajectory
-    output_trajectory = args.output_trajectory
+    input_state_data = args.input_state_data
+    output_frame = args.output_frame
+    method = args.method
     wd = args.work_dir
     log_file = args.log_file
     log_console = args.log_console
     v = args.log_verbose
     vv = args.log_debug
-    start = args.start
-    end = args.end
-    stride = args.stride
-    selection = args.selection
-    frames = args.frames
-    center = args.center
-    center_selection = args.center_selection
+    sep = args.sep
 
 
     #---------------------------- Logging ----------------------------#
@@ -204,43 +171,86 @@ def main():
                     handlers = handlers)
 
 
-    #-------------------- Convert the trajectory ---------------------#
+    #---------------------- Load the state data ----------------------#
 
-
-    # Set the path to the output trajectory
-    output_trajectory_path = os.path.join(wd, output_trajectory)
-
-    # Inform the user that we are starting the conversion
-    infostr = "Starting the conversion..."
-    logger.info(infostr)
-
-    # Try to convert the trajectory
+    
+    # Try to load the state data
     try:
-
-        conversion.convert_trajectory(\
-            input_structure = input_structure,
-            input_trajectory = input_trajectory,
-            output_trajectory = output_trajectory_path,
-            start = start,
-            end = end,
-            stride = stride,
-            selection = selection,
-            frames = frames,
-            center = center,
-            center_selection = center_selection)
+        
+        df_state_data = \
+            io.load_state_data(input_csv = input_state_data,
+                               sep = sep)
 
     # If something went wrong
     except Exception as e:
 
         # Log it and exit
         errstr = \
-            "It was not possible to convert the trajectory. " \
-            f"Error: {e}"
+            "It was not possible to load the state data from " \
+            f"'{input_state_data}'. Error: {e}"
         logger.exception(errstr)
         sys.exit(errstr)
 
-    # Inform the user that the trajectory was successfully converted
+    # Inform the user that the state data were successfully loaded
     infostr = \
-        "The trajectory was successfully converted and " \
-        f"written in '{output_trajectory_path}'."
+        "The state data were successfully loaded from " \
+        f"'{input_state_data}'."
+    logger.info(infostr)
+
+
+    #------------------------- Get the frame -------------------------#
+
+
+    # Try to find the frame
+    try:
+
+        frame = \
+            frameselection.find_frame(df = df_state_data,
+                                      method = method)
+
+    # If something went wrong
+    except Exception as e:
+
+        # Log it and exit
+        errstr = \
+            "It was not possible to find the frame with method " \
+            f"'{method}'. Error: {e}"
+        logger.exception(errstr)
+        sys.exit(errstr)
+
+    # Inform the user that the frame was successfully found
+    infostr = \
+        "The frame was successfully found with method " \
+        f"'{method}'."
+    logger.info(infostr)
+
+
+    #------------------- Save the frame's details --------------------#
+
+
+    # Set the path to the output file
+    output_frame_path = os.path.join(wd, output_frame)
+
+    # Try to save the frame's details
+    try:
+
+        frame.to_csv(output_frame_path,
+                     sep = ",",
+                     header = False)
+
+    # If something went wrong
+    except Exception as e:
+
+        # Log it and exit
+        errstr = \
+            "It was not possible to save the frame's details " \
+            f"in '{output_frame_path}'. Error: {e}"
+        logger.exception(errstr)
+        sys.exit(errstr)
+
+    # Inform the user that the frame's details were successfully
+    # saved
+    infostr = \
+        "The frame's details were successfully saved in " \
+        f"'{output_frame_path}'."
     logger.info(infostr)

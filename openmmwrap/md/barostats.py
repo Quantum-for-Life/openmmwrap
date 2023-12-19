@@ -220,14 +220,14 @@ def get_openmm_monte_carlo_membrane_barostat(options):
         _util.get_temperature(options = options,
                               obj_name = obj_name)
 
-    # Get the mode according to which the X and Y axes (the ones
+    # Get the mode according to which the x and y axes (the ones
     # assumed to contain the membrane) will be treated
     xy_mode = \
         _util.get_xy_mode(options = options,
                           obj_name = obj_name)
 
-    # Get the mode according to which the Z axis (the one assumed
-    # not to contain the membrane) will be treated
+    # Get the mode according to which the z axis (the one assumed
+    # to not contain the membrane) will be treated
     z_mode = \
         _util.get_z_mode(options = options,
                          obj_name = obj_name)
@@ -296,7 +296,7 @@ def get_barostat(name,
     """
 
     # A dictionary mapping the name of the barostat
-    # to the function setting it
+    # to the function getting it
     name2function = \
         {"openmm" : \
             {"MonteCarloBarostat" : \

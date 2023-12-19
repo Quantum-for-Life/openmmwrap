@@ -20,11 +20,11 @@ import sys
 # when importing the package
 log.getLogger("pymbar").setLevel(log.ERROR)
 # openmmwrap
-from openmmwrap import ioutil
-from openmmwrap.mdutil import (
+import openmmwrap.io as io
+from openmmwrap.md import (
     barostats,
     integrators,
-    md,
+    simulation,
     restraints,
     thermostats)
 
@@ -44,72 +44,78 @@ def main():
 
     # Add the arguments
     is_help = \
-        "The input system as a XML file containing the " \
-        "serialized 'openmm.openmm.System' object representing " \
-        "the full system."
+        "The XML file containing the serialized " \
+        "'openmm.openmm.System' object representing " \
+        "the system."
     parser.add_argument("-is", "--input-system",
                         required = True,
                         help = is_help)
 
-    ip_help = "The input system's atomic coordinates as a PDB file."
+    ip_help = \
+        "The PDB file containing the atomic coordinates of the " \
+        "input system."
     parser.add_argument("-ip", "--input-structure",
                         required = True,
                         help = ip_help)
 
     os_default = "output.xml"
     os_help = \
-        "The output system as an XML file containing the " \
+        "The name of the XML file that will contain the " \
         "serialized 'openmm.openmm.System' object representing " \
-        "the full system. The file will be written in the " \
-        f"working directory. The default file name is '{os_default}'."
+        "the output system. The file will be written in the " \
+        "working directory. The default file name " \
+        f"is '{os_default}'."
     parser.add_argument("-os", "--output-system",
                         default = os_default,
                         help = os_help)
 
     op_default = "output.pdb"
     op_help = \
-        "The output system's atomic coordinates as a PDB file. " \
-        "The file will be written in the working directory. " \
-        f"The default file name is '{op_default}'."
+        "The name of the PDB file that will contain the " \
+        "atomic coordinates of the output system. The file " \
+        "will be written in the working directory. The " \
+        f"default file name is '{op_default}'."
     parser.add_argument("-op", "--output-structure",
                         default = op_default,
                         help = op_help)
 
     ot_default = "trajectory.xtc"
     ot_help = \
-        "The output trajectory for the simulation as an XTC " \
-        "file. The file will be written in the working " \
-        f"directory. The default file name is '{ot_default}'. " \
+        "The name of the XTC file that will contain the output " \
+        "trajectory of the simulation. The file will be " \
+        "written in the working directory. The default " \
+        f"file name is '{ot_default}'. " \
         "The options used to write this file are specified " \
         "in the configuration file."
     parser.add_argument("-ot", "--output-trajectory",
                         default = ot_default,
                         help = ot_help)
 
-    od_default = "state_data.csv"
-    od_help = \
-        "The output state data file for the simulation as a " \
-        "CSV file. The file will be written in the working " \
-        f"directory. The default file name is '{od_default}'. " \
+    osd_default = "state_data.csv"
+    osd_help = \
+        "The name of the CSV file that will contain the state " \
+        "data of the simulation. The file will be written in the " \
+        "working directory. The default file name is " \
+        f"'{osd_default}'. " \
         "The options used to write this file are specified " \
         "in the configuration file."
-    parser.add_argument("-od", "--output-state-data",
-                        default = od_default,
-                        help = od_help)
+    parser.add_argument("-osd", "--output-state-data",
+                        default = osd_default,
+                        help = osd_help)
 
-    oc_default = "checkpoint.xml"
-    oc_help = \
-        "The checkpoint file for the simulation. It can be " \
-        "either a XML file containing the serialized state " \
-        "of the simulation (portable) or a CHK checkpoint " \
+    ock_default = "checkpoint.xml"
+    ock_help = \
+        "The name of the checkpoint file for the simulation. It " \
+        "can be either a XML file that wll contain the serialized " \
+        "state of the simulation (portable) or a CHK checkpoint " \
         "binary file (platform-dependent, but more thorough). " \
         "The file will be written in the working directory. " \
-        f"The default file name is '{oc_default}'. The options " \
+        f"The default file name is '{ock_default}'. The options " \
         "used to write this file are specified in the " \
         "configuration file."
-    parser.add_argument("-oc", "--output-checkpoint",
-                        default = oc_default,
-                        help = oc_help)
+    parser.add_argument("-ock", "--output-checkpoint",
+                        default = ock_default,
+                        help = ock_help)
 
     c_help = "The YAML configuration file."
     parser.add_argument("-c", "--config-file",
@@ -123,10 +129,10 @@ def main():
                         default = os.getcwd(),
                         help = d_help)
 
-    lf_default = "log.txt"
+    lf_default = "logfile.log"
     lf_help = \
-        "The name of the TXT log file. The file wil be " \
-        "written in the working directory. The default " \
+        "The name of the plain text log file. The file will " \
+        "be written in the working directory. The default " \
         f"file name is '{lf_default}'."
     parser.add_argument("-lf", "--log-file",
                         default = lf_default,
@@ -222,7 +228,7 @@ def main():
     # Try to load the configuration
     try:
 
-        config = ioutil.load_config(config_file = config_file)
+        config = io.load_config(config_file = config_file)
 
     # If something went wrong
     except Exception as e:
@@ -247,7 +253,7 @@ def main():
     # Try to load the system
     try:
         
-        system = ioutil.load_system(input_xml = input_system)
+        system = io.load_system(input_xml = input_system)
 
     # If something went wrong
     except Exception as e:
@@ -255,7 +261,7 @@ def main():
         # Log it and exit
         errstr = \
             "It was not possible to load the system from " \
-            f"'{input_system}'."
+            f"'{input_system}'. Error: {e}"
         logger.exception(errstr)
         sys.exit(errstr)
 
@@ -272,7 +278,7 @@ def main():
     try:
         
         mod = \
-            ioutil.load_system_coordinates(input_pdb = input_structure)
+            io.load_system_coordinates(input_pdb = input_structure)
 
     # If something went wrong
     except Exception as e:
@@ -319,6 +325,18 @@ def main():
                     mod = mod,
                     restraint_type = restraint_type,
                     restraint_options = restraint_options)
+
+            # Inform the user that the restraints were added
+            infostr = \
+                "The restraint was successfully added to the " \
+                f"system ('{restraint}' of '{restraint_type}')."
+            logger.info(infostr)
+
+        # Inform the user that all restraints were successfully
+        # added
+        infostr = \
+            "All restraints were successfully added to the system."
+        logger.info(infostr)
 
 
     #---------------------- Set the themorstat -----------------------#
@@ -422,7 +440,7 @@ def main():
 
     # Run the simulation      
     system_updated, mod_updated = \
-        md.run_simulation(\
+        simulation.run_simulation(\
             system = system,
             mod = mod,
             integrator = integrator,
@@ -448,7 +466,7 @@ def main():
     # Try to write the serialized system
     try:
         
-        ioutil.save_system(system = system_updated,
+        io.save_system(system = system_updated,
                            output_xml = output_system_path)
 
     # If something went wrong
@@ -476,7 +494,7 @@ def main():
     # Try to save the system's atomic coordinates
     try:
         
-        ioutil.save_system_coordinates(\
+        io.save_system_coordinates(\
             mod = mod_updated,
             output_pdb = output_structure_path)
 
@@ -487,7 +505,7 @@ def main():
         errstr = \
             "It was not possible to save the atomic coordinates " \
             "of the final system in " \
-            f"'{output_structure_path}'."
+            f"'{output_structure_path}'. Error: {e}"
         logger.exception(errstr)
         sys.exit(errstr)
 

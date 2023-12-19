@@ -32,8 +32,6 @@ from openmm import unit
 from openmmforcefields.generators import (
     GAFFTemplateGenerator,
     SMIRNOFFTemplateGenerator)
-# openmmwrap
-from openmmwrap import ioutil
 
 
 # Get the module's logger

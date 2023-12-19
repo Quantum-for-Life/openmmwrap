@@ -111,7 +111,7 @@ def get_thermostat(name,
     """
 
     # A dictionary mapping the name of the thermostat
-    # to the function setting it
+    # to the function getting it
     name2function = \
         {"openmm" : \
             {"AndersenThermostat" : \

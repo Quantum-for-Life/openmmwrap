@@ -20,8 +20,8 @@ import sys
 # when importing the package
 log.getLogger("pymbar").setLevel(log.ERROR)
 # openmmwrap
-from openmmwrap import ioutil
-from openmmwrap.mdutil import md
+import openmmwrap.io as io
+from openmmwrap.md import simulation
 
 
 def main():
@@ -40,16 +40,16 @@ def main():
 
     # Add the arguments
     ip_help = \
-        "The input structure's atomic coordinates as a PDB file."
+        "The PDB file containing the atomic coordinates of the " \
+        "input structure."
     parser.add_argument("-ip", "--input-structure",
                         required = True,
                         help = ip_help)
 
     im_help = \
-        "The non-protein, non-water molecules present in the " \
-        "input structure as a whitespace-separated list of SDF " \
-        "files, containing the chemical structures of the " \
-        "molecules."
+        "A list of SDF files containing the chemical structures " \
+        "of the non-protein, non-water molecules present in the " \
+        "input structure, if any."
     parser.add_argument("-im", "--input-molecules",
                         nargs = "*",
                         default = None,
@@ -57,9 +57,9 @@ def main():
 
     os_default = "output.xml"
     os_help = \
-        "The output system as an XML file containing the " \
+        "The name of the XML file that will contain the " \
         "serialized 'openmm.openmm.System' object representing " \
-        "the full system. The file will be written in the " \
+        "the output system. The file will be written in the " \
         "working directory. The default file name " \
         f"is '{os_default}'."
     parser.add_argument("-os", "--output-system",
@@ -68,9 +68,10 @@ def main():
 
     op_default = "output.pdb"
     op_help = \
-        "The output system's atomic coordinates as a " \
-        "PDB file. The file will be written in the working " \
-        f"directory. The default file name is '{op_default}'."
+        "The name of the PDB file that will contain the " \
+        "atomic coordinates of the output system. The file " \
+        "will be written in the working directory. The " \
+        f"default file name is '{op_default}'."
     parser.add_argument("-op", "--output-structure",
                         default = op_default,
                         help = op_help)
@@ -87,10 +88,10 @@ def main():
                         default = os.getcwd(),
                         help = d_help)
 
-    lf_default = "log.txt"
+    lf_default = "logfile.log"
     lf_help = \
-        "The name of the TXT log file. The file wil be " \
-        "written in the working directory. The default " \
+        "The name of the plain text log file. The file will " \
+        "be written in the working directory. The default " \
         f"file name is '{lf_default}'."
     parser.add_argument("-lf", "--log-file",
                         default = lf_default,
@@ -183,7 +184,7 @@ def main():
     # Try to load the configuration
     try:
 
-        config = ioutil.load_config(config_file = config_file)
+        config = io.load_config(config_file = config_file)
 
     # If something went wrong
     except Exception as e:
@@ -216,7 +217,7 @@ def main():
     try:
         
         force_field = \
-            md.get_force_field(\
+            simulation.get_force_field(\
                 force_fields_files = ff_fixed,
                 force_field_param_file = ff_param,
                 mol_files = input_molecules)
@@ -243,10 +244,10 @@ def main():
     try:
         
         system, mod = \
-            md.get_system(pdb_file = input_structure,
-                          force_field = force_field,
-                          sys_options = config["system"],
-                          solv_options = config["solvation"])
+            simulation.get_system(pdb_file = input_structure,
+                                  force_field = force_field,
+                                  sys_options = config["system"],
+                                  solv_options = config["solvation"])
 
     # If something went wrong
     except Exception as e:
@@ -272,7 +273,7 @@ def main():
     # Try to write the serialized system
     try:
         
-        ioutil.save_system(system = system,
+        io.save_system(system = system,
                            output_xml = output_system_path)
 
     # If something went wrong
@@ -300,7 +301,7 @@ def main():
     # Try to save the system's atomic coordinates
     try:
         
-        ioutil.save_system_coordinates(mod = mod,
+        io.save_system_coordinates(mod = mod,
                                        output_pdb = output_path)
 
     # If something went wrong
@@ -309,7 +310,7 @@ def main():
         # Log it and exit
         errstr = \
             "It was not possible to save the system's atomic " \
-            f"coordinates in '{output_path}'."
+            f"coordinates in '{output_path}'. Error: {e}"
         logger.exception(errstr)
         sys.exit(errstr)
 

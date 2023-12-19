@@ -22,8 +22,8 @@ import sys
 # when importing the package
 log.getLogger("pymbar").setLevel(log.ERROR)
 # openmmwrap
-from openmmwrap import ioutil
-from openmmwrap.mdutil import md
+import openmmwrap.io as io
+from openmmwrap.md import simulation
 
 
 def main():
@@ -43,34 +43,37 @@ def main():
                                 description = description)
 
     is_help = \
-        "The input system as an XML file containing the " \
-        "serialized 'openmm.System' object representing " \
-        "the full system."
+        "The XML file containing the serialized " \
+        "'openmm.openmm.System' object representing " \
+        "the system."
     parser.add_argument("-is", "--input-system",
                         required = True,
                         help = is_help)
 
-    ip_help = "The input system's atomic coordinates as a PDB file."
+    ip_help = \
+        "The PDB file containing the atomic coordinates of the " \
+        "input system."
     parser.add_argument("-ip", "--input-structure",
                         required = True,
                         help = ip_help)
 
     os_default = "output.xml"
     os_help = \
-        "The output (minimized) system as an XML file " \
-        "containing the serialized 'openmm.openmm.System' " \
-        "object representing the full system. The file will be " \
-        "written in the working directory. The default file " \
-        f"name is '{os_default}'."
+        "The name of the XML file that will contain the " \
+        "serialized 'openmm.openmm.System' object representing " \
+        "the output system. The file will be written in the " \
+        "working directory. The default file name " \
+        f"is '{os_default}'."
     parser.add_argument("-os", "--output-system",
-                       default = os_default,
-                       help = os_help)
+                        default = os_default,
+                        help = os_help)
 
     op_default = "output.pdb"
     op_help = \
-        "The output (minimized) system's atomic coordinates " \
-        "as a PDB file. The file will be written in the working " \
-        f"directory. The default file name is '{op_default}'."
+        "The name of the PDB file that will contain the " \
+        "atomic coordinates of the output system. The file " \
+        "will be written in the working directory. The " \
+        f"default file name is '{op_default}'."
     parser.add_argument("-op", "--output-structure",
                         default = op_default,
                         help = op_help)
@@ -87,10 +90,10 @@ def main():
                         default = os.getcwd(),
                         help = d_help)
 
-    lf_default = "log.txt"
+    lf_default = "logfile.log"
     lf_help = \
-        "The name of the TXT log file. The file wil be " \
-        "written in the working directory. The default " \
+        "The name of the plain text log file. The file will " \
+        "be written in the working directory. The default " \
         f"file name is '{lf_default}'."
     parser.add_argument("-lf", "--log-file",
                         default = lf_default,
@@ -183,7 +186,7 @@ def main():
     # Try to load the configuration
     try:
 
-        config = ioutil.load_config(config_file = config_file)
+        config = io.load_config(config_file = config_file)
 
     # If something went wrong
     except Exception as e:
@@ -208,7 +211,7 @@ def main():
     # Try to load the system
     try:
         
-        system = ioutil.load_system(input_xml = input_system)
+        system = io.load_system(input_xml = input_system)
 
     # If something went wrong
     except Exception as e:
@@ -216,7 +219,7 @@ def main():
         # Log it and exit
         errstr = \
             "It was not possible to load the system from " \
-            f"'{input_system}'."
+            f"'{input_system}'. Error: {e}"
         logger.exception(errstr)
         sys.exit(errstr)
 
@@ -233,7 +236,7 @@ def main():
     try:
         
         mod = \
-            ioutil.load_system_coordinates(input_pdb = input_structure)
+            io.load_system_coordinates(input_pdb = input_structure)
 
     # If something went wrong
     except Exception as e:
@@ -262,9 +265,10 @@ def main():
 
     # Minimize the system's energy
     system_updated, mod_updated = \
-        md.minimize_energy(system = system,
-                           mod = mod,
-                           options = config["minimization"])
+        simulation.minimize_energy(\
+            system = system,
+            mod = mod,
+            options = config["minimization"])
 
     # Inform the user that the minimization finished successfully
     infostr = "The energy minimization finished successfully."
@@ -280,8 +284,8 @@ def main():
     # Try to write the serialized system
     try:
         
-        ioutil.save_system(system = system_updated,
-                           output_xml = output_system_path)
+        io.save_system(system = system_updated,
+                       output_xml = output_system_path)
 
     # If something went wrong
     except Exception as e:
@@ -309,7 +313,7 @@ def main():
     # Try to save the system's atomic coordinates
     try:
         
-        ioutil.save_system_coordinates(\
+        io.save_system_coordinates(\
             mod = mod_updated,
             output_pdb = output_structure_path)
 
@@ -320,7 +324,7 @@ def main():
         errstr = \
             "It was not possible to save the atomic coordinates " \
             "of the energy-minimized system in " \
-            f"'{output_structure_path}'."
+            f"'{output_structure_path}'. Error: {e}"
         logger.exception(errstr)
         sys.exit(errstr)
 

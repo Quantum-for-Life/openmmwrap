@@ -22,6 +22,9 @@ warnings.filterwarnings("ignore",
 # Third-party packages
 import MDAnalysis as mda
 import MDAnalysis.transformations as trans
+# openmmwrap
+import openmmwrap.io as io
+
 
 # Get the module's logger
 logger = log.getLogger(__name__)
@@ -30,18 +33,27 @@ logger = log.getLogger(__name__)
 def convert_trajectory(input_structure,
                        input_trajectory,
                        output_trajectory,
+                       input_state_data = None,
                        start = None,
                        end = None,
                        stride = None,
                        selection = None,
+                       frames = None,
                        center = False,
                        center_selection = None):
     """Convert a trajectory into a different format.
     """
 
+    #--------------- Load the structure and trajectory ---------------#
+
+
     # Create a 'Universe' object from the input
     # topology and trajectory
     u = mda.Universe(input_structure, input_trajectory)
+
+
+    #--------------------- Center the trajectory ---------------------#
+
 
     # If the user requested centering the a subset of
     # atoms in the box
@@ -78,12 +90,20 @@ def convert_trajectory(input_structure,
         # on-the-fly
         u.trajectory.add_transformations(*transforms)
 
+
+    #--------------------- Select specific atoms ---------------------#
+
+
     # Set the subset of atoms to be written to the
     # output trajectory
     sel = selection if selection is not None else "all"
 
     # Get the selection from the 'Universe'
     sel_universe = u.select_atoms(sel)
+
+
+    #-------------------- Select specific frames ---------------------#
+
 
     # Set the starting point for writing the output
     # trajectory
@@ -100,9 +120,18 @@ def convert_trajectory(input_structure,
     # Create the writer
     with mda.Writer(output_trajectory, sel_universe.n_atoms) as w:
 
-        # Get the slice of trajectory to write
-        trajectory_slice = u.trajectory[start:end+stride:stride]
-        
+        # If a list of frames was provided
+        if frames is not None:
+
+            # Get only those frames
+            trajectory_slice = u.trajectory[frames]
+
+        # Otherwise
+        else:
+
+            # Get the slice of trajectory to write
+            trajectory_slice = u.trajectory[start:end+stride:stride]
+            
         # For each frame in the trajectory
         for ts in trajectory_slice:
             
@@ -116,4 +145,3 @@ def convert_trajectory(input_structure,
 
         # Leave the progress bar
         sys.stdout.write("\n")
-
