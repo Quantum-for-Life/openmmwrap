@@ -483,6 +483,7 @@ def main():
     infostr = \
         "The final system was successfully saved in " \
         f"'{output_system_path}'."
+    logger.info(infostr)
 
 
     #------------- Save the system's atomic coordinates --------------#

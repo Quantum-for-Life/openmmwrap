@@ -37,10 +37,11 @@ description = \
 packages = \
     ["openmmwrap",
      "openmmwrap.execs",
-     "openmmwrap.ioutil",
-     "openmmwrap.mdutil"]
+     "openmmwrap.io",
+     "openmmwrap.md",
+     "openmmwrap.plotting"]
 
-# Command-line executables
+# The command-line executables
 entry_points = \
     {"console_scripts" : \
         [f"{name}-create-system = " \
@@ -50,7 +51,9 @@ entry_points = \
          f"{name}-run = " \
          f"{name}.execs.{name}_run:main",
          f"{name}-convert = " \
-         f"{name}.execs.{name}_convert:main"]
+         f"{name}.execs.{name}_convert:main",
+         f"{name}-find-frame = " \
+         f"{name}.execs.{name}_find_frame:main"]
     }
 
 # Run the setup
