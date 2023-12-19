@@ -38,8 +38,7 @@ packages = \
     ["openmmwrap",
      "openmmwrap.execs",
      "openmmwrap.io",
-     "openmmwrap.md",
-     "openmmwrap.plotting"]
+     "openmmwrap.md"]
 
 # The command-line executables
 entry_points = \
