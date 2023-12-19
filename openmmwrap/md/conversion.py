@@ -133,11 +133,11 @@ def convert_trajectory(input_structure,
             trajectory_slice = u.trajectory[start:end+stride:stride]
             
         # For each frame in the trajectory
-        for ts in trajectory_slice:
+        for i, ts in enumerate(trajectory_slice):
             
             # Write out the progress
             sys.stdout.write(\
-                f"\rConverting frame {ts.frame} / " \
+                f"\rConverting frame {i+1} / " \
                 f"{len(trajectory_slice)}.")
 
             # Write out the selection at that frame
