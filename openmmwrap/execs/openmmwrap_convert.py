@@ -113,7 +113,8 @@ def main():
         "'begin', 'end', and 'stride' are ignored, if " \
         "provided."
     parser.add_argument("--frames",
-                        help = frames)
+                        help = frames,
+                        nargs = "*")
 
     selection_help = \
         "The selection string (in MDAnalysis format) " \
@@ -149,7 +150,7 @@ def main():
     end = args.end
     stride = args.stride
     selection = args.selection
-    frames = args.frames
+    frames = [int(frame) for frame in args.frames]
     center = args.center
     center_selection = args.center_selection
 
