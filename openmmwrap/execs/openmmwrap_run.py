@@ -341,7 +341,8 @@ def main():
 
         # Add the thermostat to the system
         system = \
-            thermostats.add_thermostat(name = thermo_name,
+            thermostats.add_thermostat(system = system,
+                                       name = thermo_name,
                                        is_from = thermo_is_from,
                                        options = thermo_options)
 
@@ -372,7 +373,8 @@ def main():
 
         # Add the barostat to the system
         system = \
-            barostats.add_barostat(name = bar_name,
+            barostats.add_barostat(system = system,
+                                   name = bar_name,
                                    is_from = bar_is_from,
                                    options = bar_options)
 
