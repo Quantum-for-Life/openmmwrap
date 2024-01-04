@@ -5,7 +5,7 @@
 #
 #    openmmwrap setup.
 #
-#    Copyright (C) 2023 Valentina Sora 
+#    Copyright (C) 2024 Valentina Sora 
 #                       <sora.valentina1@gmail.com>
 #
 #    This software is released under the MIT license.
@@ -38,21 +38,24 @@ packages = \
     ["openmmwrap",
      "openmmwrap.execs",
      "openmmwrap.io",
-     "openmmwrap.md"]
+     "openmmwrap.md",
+     "openmmwrap.plotting"]
 
 # The command-line executables
 entry_points = \
     {"console_scripts" : \
         [f"{name}-create-system = " \
          f"{name}.execs.{name}_create_system:main",
-         f"{name}-minimize = " \
-         f"{name}.execs.{name}_minimize:main",
-         f"{name}-run = " \
-         f"{name}.execs.{name}_run:main",
          f"{name}-convert = " \
          f"{name}.execs.{name}_convert:main",
          f"{name}-find-frame = " \
-         f"{name}.execs.{name}_find_frame:main"]
+         f"{name}.execs.{name}_find_frame:main",
+         f"{name}-minimize = " \
+         f"{name}.execs.{name}_minimize:main",
+         f"{name}-plot-state-data = " \
+         f"{name}.execs.{name}_plot_state_data:main",    
+         f"{name}-run = " \
+         f"{name}.execs.{name}_run:main"]
     }
 
 # Run the setup
