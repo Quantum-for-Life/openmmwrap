@@ -7,7 +7,7 @@
 #    performed using the BFGSM algorithm as implemented in
 #    OpenMM.
 #
-#    Copyright (C) 2023 Valentina Sora 
+#    Copyright (C) 2024 Valentina Sora 
 #                       <sora.valentina1@gmail.com>
 #
 #    This software is released under the MIT license.

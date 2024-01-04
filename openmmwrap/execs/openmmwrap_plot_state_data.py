@@ -1,9 +1,10 @@
 #!/usr/bin/env python
 # -*- Mode: python; tab-width: 4; indent-tabs-mode:nil; coding:utf-8 -*-
 
-#    openmmwrap_find_frame.py
+#    openmmwrap_plot_state_data.py
 #
-#    Find a frame in a simulation using a state data file.
+#    Plot information about a molecular dynamics simulation
+#    from a 'state data' file.
 #
 #    Copyright (C) 2024 Valentina Sora 
 #                       <sora.valentina1@gmail.com>
@@ -18,7 +19,7 @@ import os
 import sys
 # openmmwrap
 import openmmwrap.io as io
-from openmmwrap.md import frameselection
+import openmmwrap.plotting as plotting
 
 
 def main():
@@ -28,9 +29,10 @@ def main():
 
 
     # Create the argument parser
-    prog = "openmmwrap-find-frame"
+    prog = "openmmwrap-plot-state-data"
     description = \
-        "Find a frame in a simulation using a state data file."
+        "Plot information about a molecular dynamics simulation " \
+        "from a 'state data' file."
     parser = argparse.ArgumentParser(prog = prog,
                                      description = description)
 
@@ -41,30 +43,19 @@ def main():
                         required = True,
                         help = isd_help)
 
-    of_default = "frame.csv"
-    of_help = \
-        "The name of the CSV file where to write the details " \
-        "of the frame of interest. The file wil be " \
-        "written in the working directory. The default " \
-        f"file name is '{of_default}'."
-    parser.add_argument("-of", "--output-frame",
-                        default = of_default,
-                        help = of_help)
+    opl_default = "plot.pdf"
+    opl_help = \
+        "The name of the PDF file that will contain the output " \
+        "plot. The file wil be written in the working " \
+        f"directory. The default file name is '{opl_default}'."
+    parser.add_argument("-opl", "--output-plot",
+                        default = opl_default,
+                        help = opl_help)
 
-    m_choices = \
-        ["closest_to_mean_temperature",
-         "closest_to_mean_temperature_second_half",
-         "closest_to_mean_density",
-         "closest_to_mean_density_second_half",
-         "closest_to_mean_volume",
-         "closest_to_mean_volume_second_half"]
-    m_choices_str = ", ".join([f"'{c}'" for c in m_choices])
-    m_help = \
-        "The method to use to select the frame. Supported " \
-        f"methods are: {m_choices_str}."
-    parser.add_argument("-m", "--method",
+    c_help = "The YAML configuration file for plotting."
+    parser.add_argument("-c", "--config-file",
                         required = True,
-                        help = m_help)
+                        help = c_help)
 
     d_help = \
         "The working directory. The default is the current " \
@@ -99,6 +90,25 @@ def main():
                         action = "store_true",
                         help = vv_help)
 
+    time_rep_default = "step"
+    time_rep_help = \
+        "Which column of the input state data file will be " \
+        "used to represent the simulation time ('step' " \
+        f"or 'time'). By default, '{time_rep_default}' is used."
+    parser.add_argument("--time-rep",
+                        default = time_rep_default,
+                        help = time_rep_help)
+
+    quantities_str = \
+        ", ".join(f"'{q}'" for q in plotting.QUANTITIES_TO_PLOT)
+    quantities_to_plot_help = \
+        "Which quantities to plot. By default, all " \
+        "quantities reported in the input state data file " \
+        "will be plotted. Supported quantities (if present " \
+        f"in the input file) are: {quantities_str}." 
+    parser.add_argument("--quantities-to-plot",
+                        help = quantities_to_plot_help)
+
     sep_default = ","
     sep_help = \
         "The column separator in the input state data " \
@@ -111,13 +121,15 @@ def main():
     # Parse the arguments
     args = parser.parse_args()
     input_state_data = args.input_state_data
-    output_frame = args.output_frame
-    method = args.method
+    output_plot = args.output_plot
+    config_file = args.config_file
     wd = args.work_dir
     log_file = args.log_file
     log_console = args.log_console
     v = args.log_verbose
     vv = args.log_debug
+    time_rep = args.time_rep
+    quantities_to_plot = args.quantities_to_plot
     sep = args.sep
 
 
@@ -171,6 +183,31 @@ def main():
                     handlers = handlers)
 
 
+    #-------------------- Load the configuration ---------------------#
+
+
+    # Try to load the configuration
+    try:
+
+        config = io.load_config_plot(config_file = config_file)
+
+    # If something went wrong
+    except Exception as e:
+
+        # Log it and exit
+        errstr = \
+            "It was not possible to load the configuration from " \
+            f"'{config_file}'. Error: {e}"
+        logger.exception(errstr)
+        sys.exit(errstr)
+
+    # Inform the user that the configuration was successfully loaded
+    infostr = \
+        "The configuration was successfully loaded from " \
+        f"'{config_file}'."
+    logger.info(infostr)
+
+
     #---------------------- Load the state data ----------------------#
 
     
@@ -198,59 +235,33 @@ def main():
     logger.info(infostr)
 
 
-    #------------------------- Get the frame -------------------------#
+    #----------------------------- Plot ------------------------------#
 
 
-    # Try to find the frame
+    # Set the path to the output plot
+    output_plot_path = os.path.join(wd, output_plot)
+
+    # Try to generate the plot
     try:
 
-        frame = \
-            frameselection.find_frame(df = df_state_data,
-                                      method = method)
+        plotting.plot_state_data(\
+            df = df_state_data,
+            output_pdf = output_plot,
+            config = config,
+            time_rep = time_rep,
+            quantities_to_plot = quantities_to_plot)
 
     # If something went wrong
     except Exception as e:
 
         # Log it and exit
         errstr = \
-            "It was not possible to find the frame with method " \
-            f"'{method}'. Error: {e}"
+            f"It was not possible to generate the plot. Error: {e}"
         logger.exception(errstr)
         sys.exit(errstr)
 
-    # Inform the user that the frame was successfully found
+    # Inform the user that the plot was successfully generated
     infostr = \
-        "The frame was successfully found with method " \
-        f"'{method}'."
-    logger.info(infostr)
-
-
-    #------------------- Save the frame's details --------------------#
-
-
-    # Set the path to the output file
-    output_frame_path = os.path.join(wd, output_frame)
-
-    # Try to save the frame's details
-    try:
-
-        frame.to_csv(output_frame_path,
-                     sep = ",",
-                     header = False)
-
-    # If something went wrong
-    except Exception as e:
-
-        # Log it and exit
-        errstr = \
-            "It was not possible to save the frame's details " \
-            f"in '{output_frame_path}'. Error: {e}"
-        logger.exception(errstr)
-        sys.exit(errstr)
-
-    # Inform the user that the frame's details were successfully
-    # saved
-    infostr = \
-        "The frame's details were successfully saved in " \
-        f"'{output_frame_path}'."
+        "The plot was successfully generated and saved in " \
+        f"'{output_plot_path}'."
     logger.info(infostr)

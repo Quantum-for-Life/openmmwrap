@@ -6,7 +6,7 @@
 #    Utilities for I/O operations on 'state data' files obtained when
 #    running a simulation.
 #
-#    Copyright (C) 2023 Valentina Sora 
+#    Copyright (C) 2024 Valentina Sora 
 #                       <sora.valentina1@gmail.com>
 #
 #    This software is released under the MIT license.

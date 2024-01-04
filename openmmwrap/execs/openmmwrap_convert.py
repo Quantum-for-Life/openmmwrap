@@ -1,11 +1,11 @@
 #!/usr/bin/env python
 # -*- Mode: python; tab-width: 4; indent-tabs-mode:nil; coding:utf-8 -*-
 
-#    openmmwrap_conv.py
+#    openmmwrap_convert.py
 #
 #    Convert between trajectory formats.
 #
-#    Copyright (C) 2023 Valentina Sora 
+#    Copyright (C) 2024 Valentina Sora 
 #                       <sora.valentina1@gmail.com>
 #
 #    This software is released under the MIT license.
@@ -27,7 +27,7 @@ def main():
 
 
     # Create the argument parser
-    prog = "openmmwrap-conv"
+    prog = "openmmwrap-convert"
     description = \
         "Convert between trajectory formats."
     parser = argparse.ArgumentParser(prog = prog,

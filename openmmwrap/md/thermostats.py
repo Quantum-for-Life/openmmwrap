@@ -5,7 +5,7 @@
 #
 #    Utilities regarding the thermostats.
 #
-#    Copyright (C) 2023 Valentina Sora 
+#    Copyright (C) 2024 Valentina Sora 
 #                       <sora.valentina1@gmail.com>
 #
 #    This software is released under the MIT license.
